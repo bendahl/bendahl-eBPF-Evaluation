@@ -18,6 +18,9 @@
 # Unignore libbpfgo submodule
 !libbpfgo/libbpfgo
 
+# Unignore LICENSE
+!LICENSE
+
 # Ignore Vagrant settings
 .vagrant/
 
