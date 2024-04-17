@@ -1,0 +1,33 @@
+[package]
+name = "comtrace-ebpf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aya-bpf = { git = "https://github.com/aya-rs/aya", rev = "4f85ff8a7ba5f327eb9225f7633e620cedfb9051" }
+aya-log-ebpf = { git = "https://github.com/aya-rs/aya", rev = "4f85ff8a7ba5f327eb9225f7633e620cedfb9051" }
+comtrace-common = { path = "../comtrace-common" }
+memoffset = "0.8.0"
+
+[[bin]]
+name = "comtrace"
+path = "src/main.rs"
+
+[profile.dev]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = true
+panic = "abort"
+incremental = false
+codegen-units = 1
+rpath = false
+
+[profile.release]
+lto = true
+panic = "abort"
+codegen-units = 1
+
+[workspace]
+members = []

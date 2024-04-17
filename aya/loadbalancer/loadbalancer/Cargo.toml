@@ -1,0 +1,23 @@
+[package]
+name = "loadbalancer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+aya = { version="0.11.0", features=["async_tokio"]}
+aya-log = { version = "0.1.13" }
+clap = { version = "4.1", features = ["derive"] }
+loadbalancer-common = { path = "../loadbalancer-common", features = ["user"] }
+anyhow = "1"
+env_logger = "0.10"
+log = "0.4"
+tokio = { version = "1.25", features = ["macros", "rt", "rt-multi-thread", "net", "signal"] }
+network-interface = "1.0.0"
+serde = { version = "1.0.158", features = ["derive"] }
+serde_yaml = "0.9.19"
+
+
+[[bin]]
+name = "loadbalancer"
+path = "src/main.rs"

@@ -1,0 +1,3 @@
+[workspace]
+members = ["lsmbpf", "lsmbpf-common", "xtask"]
+resolver = "2"

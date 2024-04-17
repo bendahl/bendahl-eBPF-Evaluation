@@ -1,0 +1,15 @@
+[package]
+name = "comtrace"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.1.13", features = ["derive"] }
+ctrlc = "3.2.5"
+libbpf-rs = "0.20.1"
+plain = "0.2.3" # required for ::from_bytes()
+
+[build-dependencies]
+libbpf-cargo = "0.20.1"

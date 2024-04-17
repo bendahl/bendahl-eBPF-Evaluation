@@ -1,0 +1,15 @@
+[package]
+name = "jittergen"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ctrlc = "3.2.5"
+network-types = "0.0.4"
+redbpf = { version = "2.3.0", features = ["load"] }
+serde = { version = "1.0.156", features = ["derive"] }
+serde_yaml = "0.9.19"
+
+probes = { path = "./probes" }

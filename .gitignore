@@ -1,0 +1,51 @@
+# See: https://stackoverflow.com/questions/5711120/gitignore-binary-files-that-have-no-extension
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
+
+# Unignore Makefiles
+!*/**/Makefile
+
+# Unignore Vagrant files
+!*/**/Vagrantfile
+
+# Unignore libbpf submodule
+!libbpf/libbpf
+
+# Unignore libbpfgo submodule
+!libbpfgo/libbpfgo
+
+# Ignore Vagrant settings
+.vagrant/
+
+# Ignore IntelliJ project files
+*.idea
+
+# Ignore Fleet project files
+*.fleet/
+
+# Ignore output directories
+*.output/
+
+# Ignore vscode settings
+.vscode/
+
+# Ignore Kernel specific (generated) header
+vmlinux.h
+vmlinux.rs
+
+# Ignore object files
+*.o
+
+# Ingore ebpf-go specific generated files
+bpf_bpfel_*.go
+
+# Ignore logfiles
+*.log
+
+# Ignore clangd caches
+.cache/
+

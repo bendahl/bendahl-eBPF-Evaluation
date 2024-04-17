@@ -1,0 +1,13 @@
+[package]
+name = "lsmbpf"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ctrlc = "3.2.5"
+libbpf-rs = { version = "0.20.1" }
+
+[build-dependencies]
+libbpf-cargo = "0.20.1"

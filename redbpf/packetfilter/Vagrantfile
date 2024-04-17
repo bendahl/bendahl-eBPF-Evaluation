@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+
+  # Base image for all VMs
+  config.vm.box = "debian/bullseye64"
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox", automount: true
+
+  # Set up load balancer in front of the cluster
+  config.vm.define "testnode" do |tn|
+    tn.vm.hostname = "test"
+    tn.vm.network "private_network", ip: "192.168.60.2"
+    tn.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.cpus = 2
+      vb.memory = "2048"
+    end
+
+    tn.vm.provision "shell", inline: <<-SHELL
+        apt update && apt upgrade -yq
+
+        echo "Installing required tooling"
+        apt-get update && apt-get -y install \
+          bpftool \
+          curl \
+          git \
+          wget \
+          build-essential \
+          software-properties-common \
+          lsb-release \
+          libelf-dev \
+          linux-headers-generic \
+          pkg-config \
+        && wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && ./llvm.sh 14 && rm -f ./llvm.sh
+
+        update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-14  200
+        apt install libpolly-14-dev -yq
+        ln -s /usr/sbin/bpftool /usr/bin/bpftool
+    SHELL
+
+    tn.vm.provision "shell", privileged: false, inline: <<-SHELL
+        echo "Installing Rust for user 'Vagrant'"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source ~/.profile
+
+        echo "Installing redbpf dependencies"
+        rustup install 1.60
+        rustup default 1.60
+        # Locked is required in order to prevent cargo from implicitly upgrading the dependencies to potentially incompatible versions
+        cargo install cargo-bpf --locked --features=llvm13
+    SHELL
+
+  end
+end

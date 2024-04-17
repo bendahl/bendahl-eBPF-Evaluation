@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+
+  # Base image for all VMs
+  config.vm.box = "debian/bullseye64"
+
+  # Set up load balancer in front of the cluster
+  config.vm.define "loadbalancer" do |lb|
+    lb.vm.hostname = "loadbalancer"
+    # Add host-only adapter that will allow communication between host and VMs
+    lb.vm.network :private_network, ip: "192.168.60.2"
+    # Add internal network for VM-internal communication
+    # lb.vm.network :private_network, ip: "192.168.61.2", virtualbox__intnet: true
+    lb.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.cpus = 4
+      vb.memory = "4096"
+    end
+
+    lb.vm.provision "shell", inline: <<-SHELL
+      apt update && apt upgrade -yq
+
+      echo "Installing required tooling"
+      apt install bpftool build-essential curl docker.io gcc-multilib git gnupg libbpf-dev libelf-dev libssl-dev lsb-release software-properties-common make pkg-config wget -yq
+      ln -s /usr/sbin/bpftool /usr/bin/bpftool
+    SHELL
+
+    lb.vm.provision "shell", privileged: false, inline: <<-SHELL
+      echo "Installing Rust for user 'Vagrant'"
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      source ~/.profile
+      
+      echo "Installing aya dependencies"
+      cargo install bpf-linker
+      cargo install cargo-generate
+    SHELL
+  end
+
+  # Set up two backend hosts that will serve web traffic via a small web server
+  %w{backend1 backend2}.each_with_index do |name, i|
+    config.vm.define name do |be|
+      be.vm.hostname = name
+      # Add host-only adapter that will allow communication between host and VMs
+      be.vm.network :private_network, ip: "192.168.60.#{i + 3}", :mac => "cafebabe47#{i + 11}"
+      # Add internal network for VM-internal communication
+      # be.vm.network :private_network, ip: "192.168.61.#{i + 3}", :mac => "cafebabe47#{i + 11}", virtualbox__intnet: true
+      be.vm.provider "virtualbox" do |vb|
+        vb.gui = false
+        vb.cpus = 1
+        vb.memory = "1024"
+      end
+      be.vm.provision "shell", inline: <<-SHELL
+        # update package index
+        apt-get update
+
+        # use Apache 2 and a simple static html page to return the host name of the server
+        apt-get install -y apache2
+        sudo rm /var/www/html/index.html
+        echo "<html>Welcome to $(hostname).</html>" > ~/index.html
+        sudo mv ~/index.html /var/www/html
+
+        sudo su
+        # prevent ARP flux
+        echo 1 > /proc/sys/net/ipv4/conf/all/arp_ignore
+        echo 2 > /proc/sys/net/ipv4/conf/all/arp_announce
+        # persist changes to sysctl in order to survive reboots
+        echo "net.ipv4.conf.all.arp_ignore = 1" >> /etc/sysctl.conf
+        echo "net.ipv4.conf.all.arp_announce = 2" >> /etc/sysctl.conf
+        # set up loopback alias in order to enable receiving IPs originally addressing the lb
+        ip addr add 192.168.60.2 dev lo
+      SHELL
+      end
+  end
+
+end

@@ -1,0 +1,23 @@
+[package]
+name = "comtrace"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+aya = { version = "0.11.0", features=["async_tokio"] }
+aya-log = "0.1"
+clap = { version = "4.1.13", features = ["derive"] }
+comtrace-common = { path = "../comtrace-common", features = ["user"] }
+anyhow = "1"
+env_logger = "0.10"
+log = "0.4"
+tokio = { version = "1.25", features = ["macros", "rt", "rt-multi-thread", "net", "signal"] }
+network-types = "0.0.4"
+bytes = "1.4.0"
+crossbeam-channel = "0.5.8"
+ctrlc = "3.2.5"
+
+[[bin]]
+name = "comtrace"
+path = "src/main.rs"

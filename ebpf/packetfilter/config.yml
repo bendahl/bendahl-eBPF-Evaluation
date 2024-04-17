@@ -1,0 +1,19 @@
+# A maximum of 1024 rules per IP type (IPv4/IPv6) is currently supported.
+# The filter algorithm is rather conservative. Explicitly blocked IPs will be prioritized over allowed ones.
+# This means that if an IP is by accident in both lists (allow/block), packets from this source IP will be blocked.
+rules:
+  interface: lo
+  ipv4:
+    # either "block" or "allow"
+    default: allow
+#    allow:
+#      - 127.0.0.1
+#    block:
+#      - 127.0.0.1
+  ipv6:
+    # either "block" or "allow"
+    default: block
+#    allow:
+#      - ::1
+#    block:
+#     - ::1

@@ -1,0 +1,22 @@
+# outbound interface to attach to
+outIf: eth1
+# drop | jitter | reorder
+action: jitter
+# all packets will be matched against below rules
+match:
+  # approximate percentage of packets that will be altered
+  percent: 60
+  # ip | tcp | udp
+  protocol: ip
+  # only relevant for tcp or udp
+  port: 8008
+# jitter will lead to latency variations for a given percentage of packets based on min and max delay values
+jitter:
+  # minimum delay in ms by which the packet send will be postponed
+  minDelayMs: 30
+  # maximum delay in ms by which the packet send will be postponed
+  maxDelayMs: 200
+# reorder will cause some packets to be sent out of order by changing their priority and expected delivery time (edt)
+reorder:
+  # delay in ms by which the selected packets will be delayed (tweak this according to your use case; typically short delays should suffice)
+  delayMs: 10
